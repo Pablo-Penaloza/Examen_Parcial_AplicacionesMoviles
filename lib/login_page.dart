@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'registroestudiante_page.dart';
+import 'package:flutter_app_examen/registroestudiante_page.dart';
+import 'package:flutter_app_examen/dao/usuario_dao.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -11,11 +12,14 @@ class _LoginPageState extends State<LoginPage> {
   final _passController = TextEditingController();
   String _error = '';
 
-  void _login() {
-    final user = _userController.text;
-    final pass = _passController.text;
+  final dao = UsuarioDao();
 
-    if (user == 'pablin' && pass == '1720') {
+  void _login() async {
+    final user = _userController.text.trim();
+    final pass = _passController.text.trim();
+
+    final usuario = await dao.validar(user, pass);
+    if (usuario != null) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => RegisterStudentPage()),
@@ -23,6 +27,12 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       setState(() => _error = 'Usuario o contraseña incorrectos.');
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Puedes crear aquí más usuarios si lo deseas
   }
 
   @override
@@ -36,11 +46,8 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Image.asset('assets/logo.png', height: 200),
                 SizedBox(height: 30),
-                Text(
-                  'Ventana de Autenticación',
-                  style: TextStyle(fontSize: 20, color: Colors.red),
-                  textAlign: TextAlign.center,
-                ),
+                Text('Ventana de Autenticación',
+                    style: TextStyle(fontSize: 20, color: Colors.red)),
                 SizedBox(height: 30),
                 TextField(
                   controller: _userController,
@@ -59,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 if (_error.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.only(top: 20),
                     child: Text(_error, style: TextStyle(color: Colors.red)),
                   ),
               ],
